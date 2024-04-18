@@ -69,13 +69,20 @@ namespace Tmds.MDns
 
                     StartReceive(_ipv4Socket, CreateEventArgs(_ipv4Socket, OnReceive));
                 }
-
+              
                 if (supportsIPv6 && _ipv6Socket == null)
                 {
-                    _ipv6InterfaceIndex = networkInterface.GetIPProperties().GetIPv6Properties().Index;
-                    _ipv6Socket = CreateIpv6Socket(_ipv6InterfaceIndex);
+                    try
+                    {
+                        _ipv6InterfaceIndex = networkInterface.GetIPProperties().GetIPv6Properties().Index;
+                        _ipv6Socket = CreateIpv6Socket(_ipv6InterfaceIndex);
 
-                    StartReceive(_ipv6Socket, CreateEventArgs(_ipv6Socket, OnReceive));
+                        StartReceive(_ipv6Socket, CreateEventArgs(_ipv6Socket, OnReceive));
+                    }
+                    // Mono does not support IPv6 properties and always throws NotImplementedException.
+                    catch (NotImplementedException)
+                    {
+                    }
                 }
 
                 StartQuery();
